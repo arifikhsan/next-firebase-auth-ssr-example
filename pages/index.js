@@ -53,6 +53,9 @@ export default function Home() {
       <button onClick={onClick}>Login</button>
       <button onClick={checkAuth}>Check auth</button>
       <Link href={'/authenticated'}>To authenticated</Link>
+      <div>
+        <Link href={'/books'}>To books</Link>
+      </div>
     </div>
   );
 }
