@@ -3,6 +3,7 @@ import nookies from 'nookies';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase/clientApp';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 export function getServerSideProps(context) {
   const cookies = nookies.get(context);
@@ -40,6 +41,9 @@ export default function Authenticated() {
     <div>
       <h1>Authenticated</h1>
       <button onClick={logout}>Logout</button>
+      <button>
+        <Link href="/">To home</Link>
+      </button>
     </div>
   );
 }
