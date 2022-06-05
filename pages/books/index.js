@@ -1,4 +1,12 @@
-import { addDoc, collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  onSnapshot,
+  serverTimestamp,
+} from 'firebase/firestore';
 import Link from 'next/link';
 import nookies from 'nookies';
 import { useState, useEffect } from 'react';
@@ -20,7 +28,7 @@ export async function getServerSideProps(context) {
   const booksCollectionRef = collection(db, 'books');
   const documents = await getDocs(booksCollectionRef);
   const books = documents.docs.map((doc) => {
-    return { id: doc.id, ...doc.data() };
+    return { id: doc.id, title: doc.data().title };
   });
 
   return { props: { books } };
@@ -38,25 +46,46 @@ export default function Books({ books: initialData }) {
     setBooks(data);
   };
 
-  // useEffect(() => {
-  //   getBooks();
-  // }, [])
+  const watchBooks = () => {
+    onSnapshot(collection(db, 'books'), (snapshot) => {
+      const data = snapshot.docs.map((doc) => {
+        return {
+          id: doc.id,
+          title: doc.data().title,
+        };
+      });
+      setBooks(data);
+    });
+  };
+
+  useEffect(() => {
+    // getBooks();
+
+    watchBooks();
+  }, []);
 
   const [title, setTitle] = useState('');
 
   const onAddBook = (e) => {
     e.preventDefault();
 
-    addDoc(collection(db, 'books'), { title }).then(() => {
-      getBooks();
+    addDoc(collection(db, 'books'), {
+      title,
+      createdAt: serverTimestamp(),
+    }).then(() => {
       setTitle('');
+
+      // sync only
+      // getBooks();
     });
   };
 
   const onDelete = (id) => {
-    deleteDoc(doc(db, 'books', id)).then(() => {
-      getBooks();
-    });
+    deleteDoc(doc(db, 'books', id));
+    // sync only
+    // .then(() => {
+    //   getBooks();
+    // });
   };
 
   return (
