@@ -22,16 +22,18 @@ export function getServerSideProps(context) {
 export default function BookDetailPage({ id }) {
   const [book, setBook] = useState(null);
   const [title, setTitle] = useState('');
+  let unsubscribeBook;
 
   const watchBook = () => {
     const bookRef = doc(db, 'books', id);
-    onSnapshot(bookRef, (snapshot) => {
+    unsubscribeBook = onSnapshot(bookRef, (snapshot) => {
       setBook(snapshot.data());
     });
   };
 
   useEffect(() => {
     watchBook();
+    return unsubscribeBook;
   }, []);
   
   const onUpdate = (e) => {

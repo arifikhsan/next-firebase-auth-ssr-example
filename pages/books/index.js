@@ -36,6 +36,7 @@ export async function getServerSideProps(context) {
 
 export default function Books({ books: initialData }) {
   const [books, setBooks] = useState(initialData);
+  let unsubscribeBooks;
 
   // client side get books
   const getBooks = async () => {
@@ -47,7 +48,7 @@ export default function Books({ books: initialData }) {
   };
 
   const watchBooks = () => {
-    onSnapshot(collection(db, 'books'), (snapshot) => {
+    unsubscribeBooks = onSnapshot(collection(db, 'books'), (snapshot) => {
       const data = snapshot.docs.map((doc) => {
         return {
           id: doc.id,
@@ -62,6 +63,7 @@ export default function Books({ books: initialData }) {
     // getBooks();
 
     watchBooks();
+    return unsubscribeBooks;
   }, []);
 
   const [title, setTitle] = useState('');

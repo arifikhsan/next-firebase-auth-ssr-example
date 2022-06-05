@@ -9,13 +9,10 @@ const AuthContext = createContext({
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.nookies = nookies;
-    }
-
-    onAuthStateChanged(auth, async (user) => {
+  let unsubscribeAuth;
+  
+  const watchAuth = () => {
+    unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         setUser(null);
         nookies.destroy(null, 'token');
@@ -38,6 +35,14 @@ export function AuthProvider({ children }) {
       nookies.set(null, 'user', JSON.stringify(user), { path: '/' });
       nookies.set(null, 'isLoggedIn', true, { path: '/' });
     });
+  }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.nookies = nookies;
+    }
+    watchAuth();
+    return unsubscribeAuth;
   }, []);
 
   return (

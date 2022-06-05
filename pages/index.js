@@ -16,6 +16,7 @@ export function getServerSideProps(context) {
 
 export default function Home() {
   const [user, setUser] = useState(null);
+  let unsubscribeAuth;
 
   const onClick = () => {
     signInWithPopup(auth, provider)
@@ -37,7 +38,7 @@ export default function Home() {
   };
 
   const checkAuth = () => {
-    onAuthStateChanged(auth, async (user) => {
+    unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         setUser(null);
         return;
@@ -50,6 +51,7 @@ export default function Home() {
   
   useEffect(() => {
     checkAuth();
+    return unsubscribeAuth;
   }, []);
 
   return (
